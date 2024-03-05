@@ -1,30 +1,26 @@
 use std::collections::HashSet;
 
 pub fn anagrams_for<'a>(word: &str, possible_anagrams: &[&'a str]) -> HashSet<&'a str> {
-    let mut set: HashSet<&str> = HashSet::new();
-    for s in possible_anagrams {
-        if word.len() != s.len() {
-            continue;
-        }
-        let lower_cased_word = word.to_lowercase();
-        let lower_cased_candidate = s.to_lowercase();
-        if lower_cased_word.eq(&lower_cased_candidate) {
-            continue;
-        }
-        let mut word_chars: Vec<char> = lower_cased_word.chars().collect();
-        word_chars.sort();
-        let mut candidate_chars: Vec<char> = lower_cased_candidate.chars().collect();
-        candidate_chars.sort();
-        let mut is_anagram = true;
-        for i in 0..word_chars.len() {
-            if word_chars[i] != candidate_chars[i] {
-                is_anagram = false;
-                break;
-            }
-        }
-        if is_anagram {
-            set.insert(s);
-        }
+    let lower_cased_word = word.to_lowercase();
+    let mut word_chars: Vec<char> = lower_cased_word.chars().collect();
+    word_chars.sort();
+
+    possible_anagrams
+        .iter()
+        .filter(|candidate| {
+            is_anagram(&lower_cased_word, &word_chars, candidate)
+        }).copied().collect::<HashSet<&str>>()
+}
+
+pub fn is_anagram(word: &str, word_chars: &Vec<char>, candidate: &str) -> bool {
+    if word.len() != candidate.len() {
+        return false;
     }
-    set
+    let lower_cased_candidate = candidate.to_lowercase();
+    if word == lower_cased_candidate {
+        return false;
+    }
+    let mut candidate_chars: Vec<char> = lower_cased_candidate.chars().collect();
+    candidate_chars.sort();
+    candidate_chars == *word_chars
 }
